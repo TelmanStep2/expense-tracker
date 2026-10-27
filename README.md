@@ -51,7 +51,7 @@ The interface is currently in Russian:
 
  Roadmap
 
-- [ ] Delete and edit expenses
+- [x] Delete and edit expenses
 - [ ] Switch from JSON to SQLite
 - [ ] Tests with `pytest`
 - [ ] REST API with FastAPI
@@ -108,7 +108,7 @@ python main.py
 
  Планы развития
 
-- [ ] Удаление и редактирование расходов
+- [x] Удаление и редактирование расходов
 - [ ] Переход с JSON на SQLite
 - [ ] Тесты на `pytest`
 - [ ] REST API на FastAPI
