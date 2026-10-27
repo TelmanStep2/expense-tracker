@@ -61,6 +61,28 @@ def show_by_category(expenses):
         print(f"{category}: {total:.2f}")
 
 
+def delete_expense(expenses):
+    if not expenses:
+        print("Пока нет расходов.")
+        return
+
+    show_expenses(expenses)
+
+    try:
+        number = int(input("Номер расхода для удаления: "))
+    except ValueError:
+        print("Нужно ввести число.")
+        return
+
+    if number < 1 or number > len(expenses):
+        print("Такого номера нет.")
+        return
+
+    removed = expenses.pop(number - 1)
+    save_expenses(expenses)
+    print(f"Удалено: {removed['description']}")
+
+
 def main():
     expenses = load_expenses()
     while True:
@@ -68,6 +90,7 @@ def main():
         print("1. Добавить расход")
         print("2. Показать все расходы")
         print("3. Сумма по категориям")
+        print("4. Удалить расход")
         print("0. Выход")
         choice = input("Выберите действие: ").strip()
 
@@ -77,6 +100,8 @@ def main():
             show_expenses(expenses)
         elif choice == "3":
             show_by_category(expenses)
+        elif choice == "4":
+            delete_expense(expenses)
         elif choice == "0":
             print("До встречи!")
             break
