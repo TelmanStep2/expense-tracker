@@ -53,7 +53,7 @@ The interface is currently in Russian:
 
 - [x] Delete and edit expenses
 - [X] Switch from JSON to SQLite
-- [ ] Tests with `pytest`
+- [X] Tests with `pytest`
 - [ ] REST API with FastAPI
 - [ ] Web interface or Telegram bot
 
@@ -110,6 +110,6 @@ python main.py
 
 - [x] Удаление и редактирование расходов
 - [X] Переход с JSON на SQLite
-- [ ] Тесты на `pytest`
+- [X] Тесты на `pytest`
 - [ ] REST API на FastAPI
 - [ ] Веб-интерфейс или Telegram-бот
