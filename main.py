@@ -83,6 +83,46 @@ def delete_expense(expenses):
     print(f"Удалено: {removed['description']}")
 
 
+def edit_expense(expenses):
+    if not expenses:
+        print("Пока нет расходов.")
+        return
+
+    show_expenses(expenses)
+
+    try:
+        number = int(input("Номер расхода для редактирования: "))
+    except ValueError:
+        print("Нужно ввести число.")
+        return
+
+    if number < 1 or number > len(expenses):
+        print("Такого номера нет.")
+        return
+
+    expense = expenses[number - 1]
+
+    new_amount = input(f"Сумма [{expense['amount']}]: ").strip()
+    new_category = input(f"Категория [{expense['category']}]: ").strip().lower()
+    new_description = input(f"Описание [{expense['description']}]: ").strip()
+
+    if new_amount:
+        try:
+            expense["amount"] = float(new_amount.replace(",", "."))
+        except ValueError:
+            print("Нужно ввести число.")
+            return
+
+    if new_category:
+        expense["category"] = new_category
+
+    if new_description:
+        expense["description"] = new_description
+
+    save_expenses(expenses)
+    print("Расход обновлён!")
+
+
 def main():
     expenses = load_expenses()
     while True:
@@ -91,6 +131,7 @@ def main():
         print("2. Показать все расходы")
         print("3. Сумма по категориям")
         print("4. Удалить расход")
+        print("5. Редактировать расход")
         print("0. Выход")
         choice = input("Выберите действие: ").strip()
 
@@ -102,6 +143,8 @@ def main():
             show_by_category(expenses)
         elif choice == "4":
             delete_expense(expenses)
+        elif choice == "5":
+            edit_expense(expenses)
         elif choice == "0":
             print("До встречи!")
             break
