@@ -1,26 +1,15 @@
-import json
 from datetime import date
-from pathlib import Path
 
-FILE = Path("expenses.json")
-
-
-def load_expenses():
-    """Загружает расходы из файла. Если файла нет, возвращает пустой список."""
-    if FILE.exists():
-        return json.loads(FILE.read_text(encoding="utf-8"))
-    return []
+from database import (
+    init_db,
+    add_expense_db,
+    get_all_expenses,
+    delete_expense_db,
+    update_expense_db,
+)
 
 
-def save_expenses(expenses):
-    """Сохраняет расходы в файл."""
-    FILE.write_text(
-        json.dumps(expenses, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-
-
-def add_expense(expenses):
+def add_expense():
     try:
         amount = float(input("Сумма: ").replace(",", "."))
     except ValueError:
@@ -30,13 +19,7 @@ def add_expense(expenses):
     category = input("Категория (еда, транспорт...): ").strip().lower() or "другое"
     description = input("Описание: ").strip()
 
-    expenses.append({
-        "amount": amount,
-        "category": category,
-        "description": description,
-        "date": date.today().isoformat(),
-    })
-    save_expenses(expenses)
+    add_expense_db(amount, category, description, date.today().isoformat())
     print("Расход добавлен!")
 
 
@@ -61,7 +44,8 @@ def show_by_category(expenses):
         print(f"{category}: {total:.2f}")
 
 
-def delete_expense(expenses):
+def delete_expense():
+    expenses = get_all_expenses()
     if not expenses:
         print("Пока нет расходов.")
         return
@@ -78,12 +62,13 @@ def delete_expense(expenses):
         print("Такого номера нет.")
         return
 
-    removed = expenses.pop(number - 1)
-    save_expenses(expenses)
-    print(f"Удалено: {removed['description']}")
+    expense = expenses[number - 1]
+    delete_expense_db(expense["id"])
+    print(f"Удалено: {expense['description']}")
 
 
-def edit_expense(expenses):
+def edit_expense():
+    expenses = get_all_expenses()
     if not expenses:
         print("Пока нет расходов.")
         return
@@ -106,25 +91,23 @@ def edit_expense(expenses):
     new_category = input(f"Категория [{expense['category']}]: ").strip().lower()
     new_description = input(f"Описание [{expense['description']}]: ").strip()
 
+    amount = expense["amount"]
     if new_amount:
         try:
-            expense["amount"] = float(new_amount.replace(",", "."))
+            amount = float(new_amount.replace(",", "."))
         except ValueError:
             print("Нужно ввести число.")
             return
 
-    if new_category:
-        expense["category"] = new_category
+    category = new_category or expense["category"]
+    description = new_description or expense["description"]
 
-    if new_description:
-        expense["description"] = new_description
-
-    save_expenses(expenses)
+    update_expense_db(expense["id"], amount, category, description)
     print("Расход обновлён!")
 
 
 def main():
-    expenses = load_expenses()
+    init_db()
     while True:
         print("\n--- Трекер расходов ---")
         print("1. Добавить расход")
@@ -136,15 +119,15 @@ def main():
         choice = input("Выберите действие: ").strip()
 
         if choice == "1":
-            add_expense(expenses)
+            add_expense()
         elif choice == "2":
-            show_expenses(expenses)
+            show_expenses(get_all_expenses())
         elif choice == "3":
-            show_by_category(expenses)
+            show_by_category(get_all_expenses())
         elif choice == "4":
-            delete_expense(expenses)
+            delete_expense()
         elif choice == "5":
-            edit_expense(expenses)
+            edit_expense()
         elif choice == "0":
             print("До встречи!")
             break
