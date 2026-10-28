@@ -52,7 +52,7 @@ The interface is currently in Russian:
  Roadmap
 
 - [x] Delete and edit expenses
-- [ ] Switch from JSON to SQLite
+- [X] Switch from JSON to SQLite
 - [ ] Tests with `pytest`
 - [ ] REST API with FastAPI
 - [ ] Web interface or Telegram bot
@@ -109,7 +109,7 @@ python main.py
  Планы развития
 
 - [x] Удаление и редактирование расходов
-- [ ] Переход с JSON на SQLite
+- [X] Переход с JSON на SQLite
 - [ ] Тесты на `pytest`
 - [ ] REST API на FastAPI
 - [ ] Веб-интерфейс или Telegram-бот
