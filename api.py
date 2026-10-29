@@ -1,6 +1,9 @@
 from datetime import date as date_cls
+from pathlib import Path
 from typing import Optional
+
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 import database
 
@@ -19,6 +22,11 @@ class ExpenseSchema(BaseModel):
 @app.get("/")
 def root():
     return {"status": "ok"}
+
+
+@app.get("/app", include_in_schema=False)
+def frontend():
+    return FileResponse(Path(__file__).parent / "index.html")
 
 
 @app.get("/expenses")
