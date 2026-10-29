@@ -7,7 +7,6 @@ from api import app
 
 @pytest.fixture
 def client(tmp_path, monkeypatch):
-    # Подменяем файл базы на временный, чтобы не трогать настоящую expenses.db
     monkeypatch.setattr(database, "DB_FILE", tmp_path / "test.db")
     database.init_db()
     return TestClient(app)
@@ -47,12 +46,26 @@ def test_add_expense_without_date_uses_today(client):
     assert response.status_code == 201
 
     expense = client.get("/expenses").json()[0]
-    assert expense["date"]  # дата не пустая
+    assert expense["date"]  
 
 
 def test_add_expense_invalid_data(client):
-    # нет обязательного поля category
     response = client.post("/expenses", json={"amount": 10})
+    assert response.status_code == 422
+
+
+def test_add_expense_negative_amount(client):
+    response = client.post("/expenses", json={"amount": -100, "category": "food"})
+    assert response.status_code == 422
+
+
+def test_add_expense_zero_amount(client):
+    response = client.post("/expenses", json={"amount": 0, "category": "food"})
+    assert response.status_code == 422
+
+
+def test_add_expense_empty_category(client):
+    response = client.post("/expenses", json={"amount": 10, "category": ""})
     assert response.status_code == 422
 
 
@@ -85,7 +98,6 @@ def test_delete_expense(client):
 
     assert client.delete(f"/expenses/{new_id}").status_code == 200
     assert client.get("/expenses").json() == []
-    # повторное удаление: записи уже нет
     assert client.delete(f"/expenses/{new_id}").status_code == 404
 
 

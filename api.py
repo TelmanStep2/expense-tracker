@@ -1,7 +1,7 @@
 from datetime import date as date_cls
 from typing import Optional
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import database
 
 app = FastAPI()
@@ -10,8 +10,8 @@ database.init_db()
 
 
 class ExpenseSchema(BaseModel):
-    amount: float
-    category: str
+    amount: float = Field(gt=0)
+    category: str = Field(min_length=1)
     description: Optional[str] = None
     date: Optional[str] = None
 
