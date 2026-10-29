@@ -26,13 +26,14 @@ def init_db():
 
 def add_expense_db(amount, category, description, date):
     with get_connection() as conn:
-        conn.execute(
+        cursor = conn.execute(
             """
             INSERT INTO expenses (amount, category, description, date)
             VALUES (?, ?, ?, ?)
             """,
             (amount, category, description, date),
         )
+        return cursor.lastrowid
 
 
 def get_all_expenses():
@@ -45,12 +46,13 @@ def get_all_expenses():
 
 def delete_expense_db(expense_id):
     with get_connection() as conn:
-        conn.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
+        cursor = conn.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
+        return cursor.rowcount > 0
 
 
 def update_expense_db(expense_id, amount, category, description):
     with get_connection() as conn:
-        conn.execute(
+        cursor = conn.execute(
             """
             UPDATE expenses
             SET amount = ?, category = ?, description = ?
@@ -58,6 +60,7 @@ def update_expense_db(expense_id, amount, category, description):
             """,
             (amount, category, description, expense_id),
         )
+        return cursor.rowcount > 0
 
 
 if __name__ == "__main__":
