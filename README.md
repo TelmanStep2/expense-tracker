@@ -1,22 +1,27 @@
 [English](#expense-tracker) | [Русский](#трекер-расходов)
 
- Expense Tracker
+# Expense Tracker
 
-A command-line Python app for tracking personal expenses. Data is saved to a JSON file, so nothing is lost when you close the program.
+A Python app for tracking personal expenses: a command-line interface and a REST API built with FastAPI. Data is stored in a SQLite database, so nothing is lost when you close the program.
 
- Features
+## Features
 
 - Add an expense: amount, category, description, date (set automatically)
 - View all expenses and the total amount
 - View totals by category
-- Automatic saving to `expenses.json`
+- Edit and delete expenses
+- REST API with interactive documentation (Swagger UI)
+- Data is stored in SQLite (`expenses.db`)
+- Automated tests with `pytest`
 
- Tech stack
+## Tech stack
 
 - Python 3.12+
-- Standard library only: `json`, `datetime`, `pathlib`
+- SQLite (`sqlite3` from the standard library)
+- FastAPI + Uvicorn
+- pytest + httpx
 
- Getting started
+## Getting started
 
 ```bash
 git clone https://github.com/TelmanStep2/expense-tracker.git
@@ -24,12 +29,45 @@ cd expense-tracker
 python -m venv venv
 venv\Scripts\activate      # Windows
 source venv/bin/activate   # Mac/Linux
+pip install -r requirements.txt
+```
+
+### Console app
+
+```bash
 python main.py
 ```
 
-## Example
+### REST API
 
-The interface is currently in Russian:
+```bash
+uvicorn api:app --reload
+```
+
+Then open http://127.0.0.1:8000/docs for the interactive documentation.
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/expenses` | List all expenses |
+| POST | `/expenses` | Add an expense |
+| PUT | `/expenses/{id}` | Update an expense |
+| DELETE | `/expenses/{id}` | Delete an expense |
+
+Example request body for `POST /expenses` (the date is optional, today's date is used by default):
+
+```json
+{"amount": 50, "category": "food", "description": "lunch"}
+```
+
+### Tests
+
+```bash
+pytest -v
+```
+
+## Example (console app)
+
+The console interface is currently in Russian:
 
 ```
 --- Трекер расходов ---
@@ -49,33 +87,39 @@ The interface is currently in Russian:
 Итого: 15.00
 ```
 
- Roadmap
+## Roadmap
 
 - [x] Delete and edit expenses
-- [X] Switch from JSON to SQLite
-- [X] Tests with `pytest`
-- [ ] REST API with FastAPI
+- [x] Switch from JSON to SQLite
+- [x] Tests with `pytest`
+- [x] REST API with FastAPI
 - [ ] Web interface or Telegram bot
+- [ ] Deployment
 
 ---
 
- Трекер расходов
+# Трекер расходов
 
-Консольная программа на Python для учёта личных расходов. Данные сохраняются в JSON-файл, поэтому не пропадают после закрытия программы.
+Приложение на Python для учёта личных расходов: консольный интерфейс и REST API на FastAPI. Данные хранятся в базе SQLite, поэтому не пропадают после закрытия программы.
 
- Возможности
+## Возможности
 
 - Добавление расхода: сумма, категория, описание, дата (ставится автоматически)
 - Просмотр всех расходов и общей суммы
 - Сумма расходов по категориям
-- Автоматическое сохранение данных в `expenses.json`
+- Редактирование и удаление расходов
+- REST API с интерактивной документацией (Swagger UI)
+- Хранение данных в SQLite (`expenses.db`)
+- Автоматические тесты на `pytest`
 
- Технологии
+## Технологии
 
 - Python 3.12+
-- Только стандартная библиотека: `json`, `datetime`, `pathlib`
+- SQLite (модуль `sqlite3` из стандартной библиотеки)
+- FastAPI + Uvicorn
+- pytest + httpx
 
- Как запустить
+## Как запустить
 
 ```bash
 git clone https://github.com/TelmanStep2/expense-tracker.git
@@ -83,10 +127,43 @@ cd expense-tracker
 python -m venv venv
 venv\Scripts\activate      # Windows
 source venv/bin/activate   # Mac/Linux
+pip install -r requirements.txt
+```
+
+### Консольное приложение
+
+```bash
 python main.py
 ```
 
- Пример работы
+### REST API
+
+```bash
+uvicorn api:app --reload
+```
+
+После запуска откройте http://127.0.0.1:8000/docs, там интерактивная документация.
+
+| Метод | Путь | Описание |
+|---|---|---|
+| GET | `/expenses` | Список всех расходов |
+| POST | `/expenses` | Добавить расход |
+| PUT | `/expenses/{id}` | Изменить расход |
+| DELETE | `/expenses/{id}` | Удалить расход |
+
+Пример тела запроса для `POST /expenses` (дата необязательна, по умолчанию ставится сегодняшняя):
+
+```json
+{"amount": 50, "category": "food", "description": "обед"}
+```
+
+### Тесты
+
+```bash
+pytest -v
+```
+
+## Пример работы (консоль)
 
 ```
 --- Трекер расходов ---
@@ -106,10 +183,11 @@ python main.py
 Итого: 15.00
 ```
 
- Планы развития
+## Планы развития
 
 - [x] Удаление и редактирование расходов
-- [X] Переход с JSON на SQLite
-- [X] Тесты на `pytest`
-- [ ] REST API на FastAPI
+- [x] Переход с JSON на SQLite
+- [x] Тесты на `pytest`
+- [x] REST API на FastAPI
 - [ ] Веб-интерфейс или Telegram-бот
+- [ ] Деплой
