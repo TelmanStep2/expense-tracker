@@ -4,7 +4,7 @@ from datetime import date as date_cls
 from pathlib import Path
 from typing import Optional
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, Field
@@ -22,7 +22,8 @@ def require_auth(credentials: Optional[HTTPBasicCredentials] = Depends(security)
     username = os.getenv("APP_USER")
     password = os.getenv("APP_PASSWORD")
     if not username or not password:
-        return  
+        return  # защита выключена (локальная разработка, тесты)
+
     is_valid = (
         credentials is not None
         and secrets.compare_digest(credentials.username.encode(), username.encode())
@@ -34,6 +35,16 @@ def require_auth(credentials: Optional[HTTPBasicCredentials] = Depends(security)
             detail="Неверный логин или пароль",
             headers={"WWW-Authenticate": "Basic"},
         )
+
+
+def current_user(x_user_id: Optional[str] = Header(default=None)) -> str:
+    """Чьи расходы показывать. Без заголовка X-User-Id это владелец 'web'."""
+    value = (x_user_id or "").strip()
+    if not value:
+        return "web"
+    if len(value) > 64:
+        raise HTTPException(status_code=400, detail="Слишком длинный X-User-Id")
+    return value
 
 
 protected = [Depends(require_auth)]
@@ -57,28 +68,32 @@ def frontend():
 
 
 @app.get("/expenses", dependencies=protected)
-def get_expenses():
-    return database.get_all_expenses()
+def get_expenses(user_id: str = Depends(current_user)):
+    return database.get_all_expenses(user_id=user_id)
 
 
 @app.post("/expenses", status_code=201, dependencies=protected)
-def add_expense(expense: ExpenseSchema):
+def add_expense(expense: ExpenseSchema, user_id: str = Depends(current_user)):
     new_id = database.add_expense_db(
         amount=expense.amount,
         category=expense.category,
         description=expense.description,
         date=expense.date or date_cls.today().isoformat(),
+        user_id=user_id,
     )
     return {"id": new_id, "message": "Расход успешно добавлен"}
 
 
 @app.put("/expenses/{expense_id}", dependencies=protected)
-def update_expense(expense_id: int, expense: ExpenseSchema):
+def update_expense(
+    expense_id: int, expense: ExpenseSchema, user_id: str = Depends(current_user)
+):
     success = database.update_expense_db(
         expense_id=expense_id,
         amount=expense.amount,
         category=expense.category,
         description=expense.description,
+        user_id=user_id,
     )
     if not success:
         raise HTTPException(status_code=404, detail="Расход с таким ID не найден")
@@ -86,8 +101,8 @@ def update_expense(expense_id: int, expense: ExpenseSchema):
 
 
 @app.delete("/expenses/{expense_id}", dependencies=protected)
-def delete_expense(expense_id: int):
-    success = database.delete_expense_db(expense_id)
+def delete_expense(expense_id: int, user_id: str = Depends(current_user)):
+    success = database.delete_expense_db(expense_id, user_id=user_id)
     if not success:
         raise HTTPException(status_code=404, detail="Расход с таким ID не найден")
     return {"message": f"Расход {expense_id} удален"}
