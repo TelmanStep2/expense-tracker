@@ -7,8 +7,9 @@ from api import app
 
 @pytest.fixture
 def client(tmp_path, monkeypatch):
-    # Подменяем файл базы на временный, чтобы не трогать настоящую expenses.db
     monkeypatch.setattr(database, "DB_FILE", tmp_path / "test.db")
+    monkeypatch.delenv("APP_USER", raising=False)
+    monkeypatch.delenv("APP_PASSWORD", raising=False)
     database.init_db()
     return TestClient(app)
 
@@ -51,7 +52,6 @@ def test_add_expense_without_date_uses_today(client):
 
 
 def test_add_expense_invalid_data(client):
-    # нет обязательного поля category
     response = client.post("/expenses", json={"amount": 10})
     assert response.status_code == 422
 
@@ -113,3 +113,20 @@ def test_frontend_page(client):
     response = client.get("/app")
     assert response.status_code == 200
     assert "Трекер расходов" in response.text
+
+
+def test_auth_required_when_configured(client, monkeypatch):
+    monkeypatch.setenv("APP_USER", "admin")
+    monkeypatch.setenv("APP_PASSWORD", "secret")
+
+    assert client.get("/expenses").status_code == 401
+    assert client.get("/expenses", auth=("admin", "wrong")).status_code == 401
+    assert client.get("/expenses", auth=("admin", "secret")).status_code == 200
+    assert client.get("/app").status_code == 401
+
+
+def test_root_is_open_even_with_auth(client, monkeypatch):
+    monkeypatch.setenv("APP_USER", "admin")
+    monkeypatch.setenv("APP_PASSWORD", "secret")
+
+    assert client.get("/").status_code == 200
