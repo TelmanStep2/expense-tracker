@@ -12,6 +12,7 @@ A Python app for tracking personal expenses: a command-line interface, a REST AP
 - Edit and delete expenses
 - REST API with interactive documentation (Swagger UI)
 - Web interface: add, view and delete expenses in the browser
+- Optional password protection (HTTP Basic) for the API and the web interface
 - Data is stored in SQLite (`expenses.db`)
 - Input validation (positive amount, non-empty category)
 - Automated tests with `pytest`
@@ -68,6 +69,18 @@ With the server running, open http://127.0.0.1:8000/app to add, view and delete 
 
 ![Web interface](docs/screenshot.png)
 
+### Authentication (optional)
+
+If the `APP_USER` and `APP_PASSWORD` environment variables are set, the API and the web interface ask for a login and password (HTTP Basic). If they are not set, authentication is disabled. The `/` health-check endpoint is always open.
+
+```bash
+set APP_USER=admin          # Windows (cmd)
+set APP_PASSWORD=secret123
+uvicorn api:app --reload
+```
+
+On Mac/Linux use `export APP_USER=admin` and `export APP_PASSWORD=secret123`.
+
 ### Tests
 
 ```bash
@@ -103,6 +116,7 @@ The console interface is currently in Russian:
 - [x] Tests with `pytest`
 - [x] REST API with FastAPI
 - [x] Web interface
+- [x] Optional authentication
 - [ ] Telegram bot
 - [ ] Deployment
 
@@ -120,6 +134,7 @@ The console interface is currently in Russian:
 - Редактирование и удаление расходов
 - REST API с интерактивной документацией (Swagger UI)
 - Веб-интерфейс: добавление, просмотр и удаление расходов в браузере
+- Необязательная защита паролем (HTTP Basic) для API и веб-интерфейса
 - Хранение данных в SQLite (`expenses.db`)
 - Проверка входных данных (положительная сумма, непустая категория)
 - Автоматические тесты на `pytest`
@@ -176,6 +191,18 @@ uvicorn api:app --reload
 
 ![Веб-интерфейс](docs/screenshot.png)
 
+### Авторизация (необязательно)
+
+Если заданы переменные окружения `APP_USER` и `APP_PASSWORD`, API и веб-интерфейс запрашивают логин и пароль (HTTP Basic). Если они не заданы, защита выключена. Адрес `/` для проверки работоспособности всегда открыт.
+
+```bash
+set APP_USER=admin          # Windows (cmd)
+set APP_PASSWORD=secret123
+uvicorn api:app --reload
+```
+
+На Mac/Linux используйте `export APP_USER=admin` и `export APP_PASSWORD=secret123`.
+
 ### Тесты
 
 ```bash
@@ -209,5 +236,6 @@ pytest -v
 - [x] Тесты на `pytest`
 - [x] REST API на FastAPI
 - [x] Веб-интерфейс
+- [x] Необязательная авторизация
 - [ ] Telegram-бот
 - [ ] Деплой
