@@ -3,3 +3,4 @@ __pycache__/
 expenses.json
 expenses.db
 .pytest_cache/
+*.db
